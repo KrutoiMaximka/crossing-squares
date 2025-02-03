@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace crossing_squares
 {
@@ -19,6 +20,9 @@ namespace crossing_squares
     {
         string stage = "menu";
         bool mousedown = false;
+        DispatcherTimer timer;
+        int speed = 40;
+        int turn = 0;
         public MainWindow()
         {
             InitializeComponent();
@@ -109,11 +113,40 @@ namespace crossing_squares
             level2.Visibility = Visibility.Hidden;
             Cube.Visibility = Visibility.Visible;
             Red.Visibility = Visibility.Visible;
-            
+
+            timer = new DispatcherTimer();
+            timer.Interval = new TimeSpan(0,0,0,0,100);
+            timer.Tick += Timer_Tick;
+            timer.Start();
+        }
+
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            if (Canvas.GetLeft(Red) > 0 && turn == 0)
+            {
+                 Canvas.SetLeft(Red, Canvas.GetLeft(Red) - speed);
+                 if (Canvas.GetLeft(Red) == 0 && turn == 0)
+                 {
+                    turn = 1;
+                 }
+                }
+            if (Canvas.GetLeft(Red) < 1640 && turn == 1)
+            {
+                Canvas.SetLeft(Red, Canvas.GetLeft(Red) + speed);
+                if (Canvas.GetLeft(Red) >= 1640 && turn == 1)
+                {
+                    turn = 0;
+                }
+            }
 
         }
+
         private void Menu()
         {
+            if (timer != null && timer.IsEnabled)
+            {
+                timer.Stop();
+            }
             if (stage == "menu")
                 {
                 Finish.Visibility = Visibility.Hidden;
